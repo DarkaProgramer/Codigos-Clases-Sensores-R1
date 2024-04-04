@@ -1,0 +1,32 @@
+#define BUZZER_PIN_ACTIVO 2  // Pin para el buzzer activo
+#define BUZZER_PIN_PASIVO 4  // Pin para el buzzer pasivo
+#define INTERVALO 5000        // Intervalo de tiempo en milisegundos (5 segundos)
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(BUZZER_PIN_ACTIVO, OUTPUT);
+  pinMode(BUZZER_PIN_PASIVO, OUTPUT);
+}
+
+void loop() {
+  // Activa el buzzer activo
+  digitalWrite(BUZZER_PIN_ACTIVO, HIGH);
+  Serial.println("Buzzer Activo activado");
+  delay(1000); // Duración del tono
+  
+  // Desactiva el buzzer activo
+  digitalWrite(BUZZER_PIN_ACTIVO, LOW);
+  Serial.println("Buzzer Activo desactivado");
+
+  // Activa el buzzer pasivo
+  tone(BUZZER_PIN_PASIVO, 1000); // Activa el buzzer pasivo con frecuencia de 1000Hz
+  Serial.println("Buzzer Pasivo activado");
+  delay(1000); // Duración del tono
+
+  // Desactiva el buzzer pasivo
+  noTone(BUZZER_PIN_PASIVO);
+  Serial.println("Buzzer Pasivo desactivado");
+
+  delay(INTERVALO); // Espera 5 segundos antes de volver a iniciar el ciclo
+}
+

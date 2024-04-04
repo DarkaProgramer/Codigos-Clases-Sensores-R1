@@ -1,0 +1,83 @@
+///////////////////////////
+Sensor KY-037 Big sound
+///////////////////////////
+
+from machine import Pin, ADC, I2C
+import ssd1306
+import time
+
+# Configurar el bus I2C para la pantalla OLED
+i2c = I2C(-1, scl=Pin(22), sda=Pin(21))
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+
+# Configurar el pin del sensor Big Sound
+sensor_pin = Pin(32, Pin.IN)
+
+def main():
+    while True:
+        # Leer el valor del sensor
+        sensor_value = sensor_pin.value()
+        
+        # Limpiar la pantalla
+        oled.fill(0)
+        
+        # Mostrar el mensaje dependiendo del valor del sensor
+        if sensor_value == 1:
+            oled.text("Sensor activo", 0, 0)
+        else:
+            oled.text("Sensor desactivado", 0, 0)
+        
+        # Actualizar la pantalla
+        oled.show()
+        
+        # Esperar un tiempo antes de la próxima lectura
+        time.sleep(0.5)
+
+if __name__ == "__main__":
+    main()
+
+
+///////////////////////////
+Sensor KY- Ultrasonico
+///////////////////////////
+
+from machine import Pin, I2C
+import ssd1306
+import time
+from hcsr04 import HCSR04
+
+# Configurar el bus I2C para la pantalla OLED
+i2c = I2C(-1, scl=Pin(22), sda=Pin(21))
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+
+# Configurar el pin del sensor ultrasónico HC-SR04
+sensor = HCSR04(trigger_pin=16, echo_pin=17)
+
+# Distancia de activación del sensor (en centímetros)
+umbral_distancia = 10
+
+def main():
+    while True:
+        # Leer la distancia del sensor ultrasónico
+        distancia = sensor.distance_cm()
+        
+        # Limpiar la pantalla
+        oled.fill(0)
+        
+        # Mostrar el mensaje dependiendo de la distancia leída
+        if distancia < umbral_distancia:
+            oled.text("Objeto detectado", 0, 0)
+        else:
+            oled.text("Sin objeto", 0, 0)
+        
+        # Mostrar la distancia en la pantalla OLED
+        oled.text("Distancia: {:.2f} cm".format(distancia), 0, 20)
+        
+        # Actualizar la pantalla
+        oled.show()
+        
+        # Esperar un tiempo antes de la próxima lectura
+        time.sleep(0.5)
+
+if __name__ == "__main__":
+    main()

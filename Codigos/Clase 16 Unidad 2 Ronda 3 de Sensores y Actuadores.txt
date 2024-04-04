@@ -1,0 +1,65 @@
+//////////////////////////
+Sensor small sound KY-038
+//////////////////////////
+
+#define SENSOR_PIN 4    // Pin digital donde está conectado el sensor de sonido
+#define BUZZER_PIN 13   // Pin digital donde está conectado el buzzer
+
+int threshold = 500;    // Umbral de sonido para activar el buzzer
+unsigned long lastSoundTime = 0;
+unsigned long buzzDuration = 1000;  // Duración del sonido del buzzer en milisegundos (1 segundo)
+
+void setup() {
+  pinMode(SENSOR_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = digitalRead(SENSOR_PIN); // Leer el valor digital del sensor
+
+  if (sensorValue == HIGH) {
+    // Si se detecta un sonido, se activa el buzzer y se guarda el tiempo actual
+    digitalWrite(BUZZER_PIN, HIGH);
+    lastSoundTime = millis();
+  } else {
+    // Si no se detecta un sonido, se desactiva el buzzer después de la duración especificada
+    if (millis() - lastSoundTime >= buzzDuration) {
+      digitalWrite(BUZZER_PIN, LOW);
+    }
+  }
+
+  delay(100);  // Pequeña pausa entre lecturas del sensor
+}
+
+//////////////////////////
+Sensor de temperatura KY-028
+//////////////////////////
+#include <DHT.h> // Incluir la librería para el sensor DHT
+#define DHTPIN 4      // Pin digital donde está conectado el sensor DHT (KY-028)
+#define DHTTYPE DHT11 // Tipo del sensor DHT
+
+#define BUZZER_PIN 13   // Pin digital donde está conectado el buzzer
+#define TEMPERATURE_THRESHOLD 25 // Umbral de temperatura para activar el buzzer
+
+DHT dht(DHTPIN, DHTTYPE); // Inicializar el sensor DHT
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+  Serial.begin(9600);
+  dht.begin(); // Inicializar el sensor DHT
+}
+
+void loop() {
+  float temperature = dht.readTemperature(); // Leer la temperatura del sensor DHT
+  
+  if (!isnan(temperature) && temperature > TEMPERATURE_THRESHOLD) {
+    // Si la lectura de temperatura es válida y supera el umbral, activar el buzzer
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else {
+    // Si no se supera el umbral de temperatura, desactivar el buzzer
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+
+  delay(1000); // Pequeña pausa entre las lecturas de temperatura
+}

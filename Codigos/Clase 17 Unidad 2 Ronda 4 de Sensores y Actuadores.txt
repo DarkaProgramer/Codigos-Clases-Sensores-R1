@@ -1,0 +1,63 @@
+///////////////////////
+ky-040 rotay enconders
+///////////////////////
+#define BUZZER_PIN 4  // Pin del buzzer (cambiar al pin deseado)
+#define SENSOR_PIN_CLK 2  // Pin CLK del sensor KY-040 (cambiar al pin deseado)
+#define SENSOR_PIN_DT 3   // Pin DT del sensor KY-040 (cambiar al pin deseado)
+#define SENSOR_PIN_SW 5   // Pin SW del sensor KY-040 (cambiar al pin deseado)
+
+volatile int state = LOW;
+volatile int previousState = LOW;
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(SENSOR_PIN_CLK, INPUT);
+  pinMode(SENSOR_PIN_DT, INPUT);
+  pinMode(SENSOR_PIN_SW, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(SENSOR_PIN_CLK), checkRotaryEncoder, CHANGE);
+}
+
+void loop() {
+  if (state == HIGH && previousState == LOW) {
+    hacerSonarBuzzer();
+  }
+  previousState = state;
+}
+
+void checkRotaryEncoder() {
+  state = digitalRead(SENSOR_PIN_CLK);
+}
+
+void hacerSonarBuzzer() {
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(1000);  // Cambia este valor según la duración del sonido que deseas
+  digitalWrite(BUZZER_PIN, LOW);
+}
+
+///////////////////////
+sensor KY-027 Light cup
+///////////////////////
+
+#define BUZZER_PIN 4  // Pin del buzzer (cambiar al pin deseado)
+#define SENSOR_PIN_LIGHT A0  // Pin de entrada analógica del sensor de luz KY-027
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+  Serial.begin(9600); // Inicia la comunicación serial para la depuración
+}
+
+void loop() {
+  int lightValue = analogRead(SENSOR_PIN_LIGHT); // Lee el valor del sensor de luz
+
+  if (lightValue > 500) { // Si el valor del sensor de luz es mayor que 500 (ajusta este umbral según sea necesario)
+    hacerSonarBuzzer();
+  }
+
+  delay(100); // Pequeño retardo para evitar la saturación del bucle
+}
+
+void hacerSonarBuzzer() {
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(1000);  // Cambia este valor según la duración del sonido que deseas
+  digitalWrite(BUZZER_PIN, LOW);
+}

@@ -1,0 +1,57 @@
+//////////////////////////////////
+Sensor KY-017 Tilt switch
+//////////////////////////////////
+
+#define BUZZER_PIN 4  // Pin del buzzer (cambiar al pin deseado)
+#define SENSOR_PIN_TILT 2  // Pin del sensor KY-017 Tilt switch (cambiar al pin deseado)
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(SENSOR_PIN_TILT, INPUT_PULLUP); // Configura el pin del sensor Tilt como entrada con resistencia pull-up
+  Serial.begin(9600); // Inicia la comunicación serial para la depuración
+}
+
+void loop() {
+  int tiltState = digitalRead(SENSOR_PIN_TILT); // Lee el estado del sensor Tilt
+  
+  if (tiltState == HIGH) { // Si el sensor Tilt se activa (cambia a LOW cuando está inclinado)
+    hacerSonarBuzzer();
+  }
+
+  delay(100); // Pequeño retardo para evitar la saturación del bucle
+}
+
+void hacerSonarBuzzer() {
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(1000);  // Cambia este valor según la duración del sonido que deseas
+  digitalWrite(BUZZER_PIN, LOW);
+}
+
+//////////////////////////////////
+Sensor KY-020 Ball switch 
+//////////////////////////////////
+
+#define BUZZER_PIN 4  // Pin del buzzer (cambiar al pin deseado)
+#define SENSOR_PIN_BALL 2  // Pin del sensor KY-020 Ball switch (cambiar al pin deseado)
+
+void setup() {
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(SENSOR_PIN_BALL, INPUT_PULLUP); // Configura el pin del sensor Ball switch como entrada con resistencia pull-up
+  Serial.begin(9600); // Inicia la comunicación serial para la depuración
+}
+
+void loop() {
+  int ballState = digitalRead(SENSOR_PIN_BALL); // Lee el estado del sensor Ball switch
+  
+  if (ballState == LOW) { // Si el sensor Ball switch se activa (cambia a LOW cuando está inclinado)
+    hacerSonarBuzzer();
+  }
+
+  delay(100); // Pequeño retardo para evitar la saturación del bucle
+}
+
+void hacerSonarBuzzer() {
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(1000);  // Cambia este valor según la duración del sonido que deseas
+  digitalWrite(BUZZER_PIN, LOW);
+}

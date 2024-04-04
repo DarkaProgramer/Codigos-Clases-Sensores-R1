@@ -1,0 +1,121 @@
+////////////////////////
+linear hall
+/////////////////////////
+
+from machine import Pin, ADC
+from umqtt.simple import MQTTClient
+import time
+import network
+
+# Configuración del pin conectado al sensor KY-024
+pin_analogico = 34  # Cambiar al pin adecuado donde esté conectado el sensor
+
+# Definir el umbral de detección (ajustar según sea necesario)
+umbral_deteccion = 2000  # Este valor debe ser ajustado experimentalmente
+
+# Configuración de red WiFi
+ssid = "No Paso Internet Ivana"
+password = "123456789"
+
+# Configuración MQTT
+mqtt_broker = "192.168.68.200"  # Dirección IP del broker MQTT
+mqtt_topic = "utng/arg/lenear"
+
+# Inicializar el pin ADC para lecturas analógicas
+sensor_adc = ADC(Pin(pin_analogico))
+sensor_adc.width(ADC.WIDTH_12BIT)  # Resolución de 12 bits
+sensor_adc.atten(ADC.ATTN_11DB)     # Atenuación de 11 dB (rango de voltaje de 0-3.6V)
+
+# Función para leer el valor del sensor y convertirlo a mV
+def leer_sensor():
+    valor = sensor_adc.read()
+    return valor * 3600 / 4095  # Convertir lectura a milivoltios
+
+# Función para conectar a WiFi
+def connect_wifi():
+    sta_if = network.WLAN(network.STA_IF)
+    if not sta_if.isconnected():
+        print("Conectando a WiFi...")
+        sta_if.active(True)
+        sta_if.connect(ssid, password)
+        while not sta_if.isconnected():
+            pass
+    print("Conexión WiFi exitosa")
+
+# Función para conectar a MQTT
+def connect_mqtt():
+    client = MQTTClient("esp32", mqtt_broker)
+    client.connect()
+    print("Conexión MQTT exitosa")
+    return client
+
+# Función para publicar el valor del sensor en MQTT si supera el umbral de detección
+def publish_sensor_value(valor, client):
+    if valor > umbral_deteccion:
+        payload = "{:.2f}".format(valor)
+        client.publish(mqtt_topic, payload)
+        print("Valor del campo magnético publicado:", payload)
+
+# Función principal para ejecutar el programa
+def main():
+    connect_wifi()
+    mqtt_client = connect_mqtt()
+    while True:
+        valor_sensor = leer_sensor()
+        publish_sensor_value(valor_sensor, mqtt_client)
+        time.sleep(1)  # Esperar 1 segundo antes de la próxima lectura
+
+if __name__ == "__main__":
+    main()
+
+
+////////////////////7
+hall magnetic
+////////////////////
+
+from machine import Pin
+import time
+from umqtt.simple import MQTTClient
+
+# Configuración de la red WiFi
+ssid = "No Paso Internet Ivana"
+password = "123456789"
+# Configuración del broker MQTT
+mqtt_broker = "192.168.40.200"
+mqtt_topic = "utng/arg/hall_magnetico"
+
+# Configuración del pin del sensor Hall Magnético
+sensor_pin = Pin(14, Pin.IN)  # Pin conectado al sensor Hall Magnético
+
+def connect_wifi():
+    import network
+    sta_if = network.WLAN(network.STA_IF)
+    if not sta_if.isconnected():
+        print("Conectando a WiFi...")
+        sta_if.active(True)
+        sta_if.connect(ssid, password)
+        while not sta_if.isconnected():
+            pass
+    print("Conexión WiFi exitosa")
+
+def connect_mqtt():
+    client = MQTTClient("esp32", mqtt_broker)
+    client.connect()
+    print("Conexión MQTT exitosa")
+    return client
+
+def detectar_iman():
+    return sensor_pin.value() == 0  # Retorna True si se detecta un imán (valor del pin en bajo)
+
+def main():
+    connect_wifi()
+    mqtt_client = connect_mqtt()
+
+    while True:
+        if detectar_iman():
+            print("¡Se ha detectado un imán!")
+            mqtt_client.publish(mqtt_topic, b"¡Se ha detectado un imán!")
+        time.sleep(1)  # Espera antes de realizar la próxima lectura
+
+if __name__ == "__main__":
+    main()
